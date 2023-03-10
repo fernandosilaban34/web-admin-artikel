@@ -1,13 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+import { BrowserRouter } from 'react-router-dom';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { AuthProvider } from 'react-auth-kit';
+import App from './routes/App';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <AuthProvider
+        authType="cookie"
+        authName="_auth"
+        cookieDomain={window.location.hostname}
+        cookieSecure={false}
+      >
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
   </React.StrictMode>,
 );
 
