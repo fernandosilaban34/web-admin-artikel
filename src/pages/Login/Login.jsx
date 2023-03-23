@@ -1,15 +1,20 @@
 import { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useSignIn } from 'react-auth-kit';
+import { useNavigate } from 'react-router-dom';
+import { gapi } from 'gapi-script';
 import {
   faUser, faLock, faEye, faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
+import GoogleLogin from 'react-google-login';
+// import googleIcon from '../../assets/icon/google.ico';
 
 export default function Login() {
   const [login, setLogin] = useState({});
   const [show, setShow] = useState(true);
   const [errMsg, setErrMsg] = useState('');
   const signIn = useSignIn();
+  const navigate = useNavigate();
 
   // const userRef = useRef();
   const errRef = useRef();
@@ -22,18 +27,37 @@ export default function Login() {
     setLogin({ ...login, [name]: value });
   };
 
+  const handleSignIn = (tokenAPI) => {
+    signIn({
+      token: tokenAPI,
+      expiresIn: 3600,
+      tokenType: 'Bearer',
+      authState: { username: login.username },
+    });
+
+    navigate('/');
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrMsg('Error loggin');
     errRef.current.focus();
 
-    console.log(login.username);
-    signIn({
-      token: 'tere',
-      expiresIn: 3600,
-      tokenType: 'Bearer',
-      authState: { username: login.username },
-    });
+    // signIn({
+    //   token: 'tere',
+    //   expiresIn: 3600,
+    //   tokenType: 'Bearer',
+    //   authState: { username: login.username },
+    // });
+    handleSignIn('tere');
+  };
+
+  const handleOnSuccess = () => {
+    handleSignIn(gapi.auth.getToken().access_token);
+  };
+
+  const handleOnFailure = (res) => {
+    alert(res, 'Login Failed');
   };
 
   return (
@@ -88,7 +112,15 @@ export default function Login() {
                   <div className="relative">
                     <button type="submit" className="bg-blue-500 text-white rounded-md px-3 py-2 text-sm ">Submit</button>
                   </div>
+                  <GoogleLogin
+                    clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}
+                    onSuccess={handleOnSuccess}
+                    onFailure={handleOnFailure}
+                    cookiePolicy="single_host_origin"
+                    isSignedIn
+                  />
                 </div>
+                {/* <img src={googleIcon} alt="icon" /> */}
               </form>
             </div>
           </div>

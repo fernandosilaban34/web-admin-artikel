@@ -1,6 +1,7 @@
-import { lazy } from 'react';
+import { lazy, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { RequireAuth } from 'react-auth-kit';
+import { gapi } from 'gapi-script';
 import Missing from '../pages/Missing';
 // import NavWrapper from './components/NavWrapper';
 
@@ -12,6 +13,17 @@ const Profile = lazy(() => import('../pages/Profile'));
 const Login = lazy(() => import('../pages/Login'));
 
 function App() {
+  useEffect(() => {
+    const start = () => {
+      gapi.client.init({
+        clientId: process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID,
+        scope: '',
+      });
+    };
+
+    gapi.load('client:auth2', start);
+  });
+
   return (
     <div className="h-full w-full">
       <Routes>
